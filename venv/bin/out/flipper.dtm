@@ -1,0 +1,25 @@
+[:] q1
+[.] q0
+
+q1 . -> q1 X r
+q1 X -> q1 X r
+q1 Y -> q2 Y r
+q1 E -> q3 E r
+q2 . -> q2 Y r
+q2 X -> q1 X r
+q2 Y -> q2 Y r
+q2 E -> q3 E r
+q3 . -> q4 . l
+q3 X -> q4 X l
+q3 Y -> q4 Y l
+q3 E -> q4 E l
+q4 . -> q0 . r
+q4 X -> q0 X r
+q4 Y -> q0 Y r
+q4 E -> q0 E r
+
+=-=-=
+inf~-1: .
+0~inf: .
+-2~-1: . .
+0: . . X . X . Y . Y . X . Y . Y Y . X . . X X . . E
