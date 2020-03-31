@@ -195,7 +195,7 @@ class GoldState(LNRState):
         SAVE2 = self.state()
         END = self.state()
 
-        PREPARATION1 = INIT.incrementNum().copyNum().decrementTerm().prepareIteration().on(ANY).go(L, CHECKINGDIVIDER1)
+        INIT.incrementNum().incrementNum().copyNum().decrementTerm().prepareIteration().on(ANY).go(L, CHECKINGDIVIDER1)
 
         CHECKINGDIVIDER1.copyFactor().checkDivider().step_right().on(ANY).go(L, CHECKDIVIDER1)
 
@@ -205,7 +205,7 @@ class GoldState(LNRState):
         CHECKNEXTFACTOR1.step_right().on(E).go(L, SAVE1)                               # prime
         CHECKNEXTFACTOR1.step_right().on(c).go(L, ITERATE1)                            # inconclusive so far
 
-        ITERATE1.iterateFactor().on(ANY).go(L, PREPARATION1)
+        ITERATE1.iterateFactor().on(ANY).go(L, CHECKINGDIVIDER1)
 
         DELETE1.deleteNonPrime().on(ANY).go(L, PREPARATION2)
         SAVE1.savePrime().on(ANY).go(L, PREPARATION2)
