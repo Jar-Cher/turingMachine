@@ -174,6 +174,146 @@ class GoldState(LNRState):
 
         return STOP
 
+    def copyc(self):
+        INIT = self
+        STOP = self.state()
+        UNMARK = self.state()
+
+        SEARCH = INIT.move_left_until(c, overstep=L).step_left().move_left_while(lx, overstep=R).step_left()
+        SEARCH.on(E).go(R, UNMARK)
+        SEARCH.on(t).go(R, UNMARK)
+        (SEARCH.on(l).new(R).step_left()
+         .drop(lx, L).move_right_until(S, overstep=R)
+         .move_right_while(l, overstep=R).step_left().drop(l, R)
+         .on(ANY).go(R, INIT))
+
+        UNMARK.on(ANY).go(L, STOP)
+        UNMARK.on(lx).cycle(R, l)
+
+        return STOP
+
+
+    def copyC(self):
+        INIT = self
+        STOP = self.state()
+        UNMARK = self.state()
+
+        SEARCH = INIT.move_left_until(C, overstep=L).move_left_while(lx, overstep=R).step_left()
+        SEARCH.on(E).go(R, UNMARK)
+        SEARCH.on(t).go(R, UNMARK)
+        SEARCH.on(c).go(R, UNMARK)
+        (SEARCH.on(l).new(R).step_left()
+         .drop(lx, L).move_right_until(S, overstep=R)
+         .move_right_while(l, overstep=R).step_left().drop(l, R)
+         .on(ANY).go(R, INIT))
+
+        UNMARK.on(ANY).go(L, STOP)
+        UNMARK.on(lx).cycle(R, l)
+
+        return STOP
+
+
+    def compare(self):
+        INIT = self
+        STOP = self.state()
+        CHECK = self.state()
+        AFTERCHECK = self.state()
+        NEXTSYMBOL = self.state()
+
+        SEARCH = INIT.move_right_while(lx, overstep=R).step_left()
+        SEARCH.on(B).go(L, AFTERCHECK)
+        (SEARCH.on(l).new(R).step_left()
+         .drop(lx, L).move_right_until(N, overstep=R)
+         .move_right_while(lx, overstep=R).on(ANY).go(L, NEXTSYMBOL))
+
+        NEXTSYMBOL.on(l).new(R).step_left().drop(lx, R).step_right().on(ANY).go(L, CHECK)
+        NEXTSYMBOL.on(E).new(L).drop(l, R).on(ANY).go(L, STOP)
+
+        CHECK.on(l).new(R).move_left_until(S, overstep=R).step_left().on(ANY).go(R, INIT)
+        CHECK.on(E).go(L, AFTERCHECK)
+
+        AFTERCHECK.move_right_until(E, overstep=R).step_left().on(ANY).go(L, STOP)
+
+        return STOP
+
+
+    def clearSum(self):
+        INIT = self
+        CLEARNUM = self.state()
+        CLEARSUM = self.state()
+        STOP = self.state()
+
+        INIT.move_right_until(E, overstep=L).step_right().on(ANY).go(L, CLEARNUM)
+
+        CLEARNUM.on(l).cycle(L, l)
+        CLEARNUM.on(lx).cycle(L, l)
+        CLEARNUM.on(N).go(L, CLEARSUM)
+
+        CLEARSUM.on(B).cycle(L, B)
+        CLEARSUM.on(l).cycle(L, B)
+        CLEARSUM.on(lx).cycle(L, B)
+        CLEARSUM.on(S).go(L, STOP)
+
+        return STOP
+
+
+    def finishIteration(self):
+        INIT = self
+        CLEARNUM = self.state()
+        CLEARSUM = self.state()
+        STOP = self.state()
+
+        (INIT.move_right_until(S, overstep=R).move_left_until(c, overstep=R).step_left()
+         .drop(t, L).move_right_until(S, overstep=R).move_left_until(C, overstep=R).step_left()
+         .drop(T, L).on(ANY).go(R, STOP))
+
+        return STOP
+
+    def checkNextc(self):
+        INIT = self
+        STOP = self.state()
+
+        INIT.move_left_until(c, overstep=L).step_left().move_left_while(l, overstep=L).on(ANY).go(R, STOP)
+
+        return STOP
+
+
+    def checkNextC(self):
+        INIT = self
+        STOP = self.state()
+
+        INIT.move_left_until(C, overstep=L).move_left_while(l, overstep=L).step_left().on(ANY).go(R, STOP)
+
+        return STOP
+
+    def resetc(self):
+        INIT = self
+        STOP = self.state()
+
+        (INIT.move_right_until(c, overstep=R).step_left().drop(t, L)
+         .move_left_until(S, overstep=L).drop(c, L).on(ANY).go(R, STOP))
+
+        return STOP
+
+    def iteratec(self):
+        INIT = self
+        STOP = self.state()
+
+        (INIT.move_right_until(c, overstep=R).step_left().drop(t, L)
+         .move_left_until(t, overstep=R).step_left().drop(c, L).on(ANY).go(R, STOP))
+
+        return STOP
+
+
+    def iterateC(self):
+        INIT = self
+        STOP = self.state()
+
+        (INIT.move_right_until(C, overstep=R).step_left().drop(T, L)
+         .move_left_until(T, overstep=R).step_left().drop(C, L).on(ANY).go(R, STOP))
+
+        return STOP
+
 
     def main(self):
         INIT = self
@@ -193,17 +333,22 @@ class GoldState(LNRState):
         DELETE2 = self.state()
         SAVE1 = self.state()
         SAVE2 = self.state()
+        PREPARESUM = self.state()
+        SUMCYCLE = self.state()
+        COMPARED = self.state()
+        CHECKINGC = self.state()
+        FINISH = self.state()
         END = self.state()
 
         INIT.incrementNum().incrementNum().copyNum().decrementTerm().prepareIteration().on(ANY).go(L, CHECKINGDIVIDER1)
 
         CHECKINGDIVIDER1.copyFactor().checkDivider().step_right().on(ANY).go(L, CHECKDIVIDER1)
 
-        CHECKDIVIDER1.on(l).new(R).clearFactor().checkNextFactor().on(ANY).go(L, CHECKNEXTFACTOR1)
+        CHECKDIVIDER1.on(l).new(R).clearFactor().checkNextFactor().step_right().on(ANY).go(L, CHECKNEXTFACTOR1)
         CHECKDIVIDER1.on(lx).new(R).clearFactor().on(ANY).go(L, DELETE1)               # not prime
 
-        CHECKNEXTFACTOR1.step_right().on(E).go(L, SAVE1)                               # prime
-        CHECKNEXTFACTOR1.step_right().on(c).go(L, ITERATE1)                            # inconclusive so far
+        CHECKNEXTFACTOR1.on(E).go(L, SAVE1)                                            # prime
+        CHECKNEXTFACTOR1.on(t).go(L, ITERATE1)                                         # inconclusive so far
 
         ITERATE1.iterateFactor().on(ANY).go(L, CHECKINGDIVIDER1)
 
@@ -214,16 +359,35 @@ class GoldState(LNRState):
 
         CHECKINGDIVIDER2.copyFactor().checkDivider().step_right().on(ANY).go(L, CHECKDIVIDER2)
 
-        CHECKDIVIDER2.on(l).new(R).clearFactor().checkNextFactor().on(ANY).go(L, CHECKNEXTFACTOR2)
+        CHECKDIVIDER2.on(l).new(R).clearFactor().checkNextFactor().step_right().on(ANY).go(L, CHECKNEXTFACTOR2)
         CHECKDIVIDER2.on(lx).new(R).clearFactor().on(ANY).go(L, DELETE2)               # not prime
 
-        CHECKNEXTFACTOR2.step_right().on(E).go(L, SAVE2)                               # prime
-        CHECKNEXTFACTOR2.step_right().on(c).go(L, ITERATE2)                            # inconclusive so far
+        CHECKNEXTFACTOR2.on(E).go(L, SAVE2)                                            # prime
+        CHECKNEXTFACTOR2.on(t).go(L, ITERATE2)                                         # inconclusive so far
 
         ITERATE2.iterateFactor().on(ANY).go(L, PREPARATION2)
 
-        DELETE2.deleteNonPrime().on(ANY).go(L, END)
-        SAVE2.savePrime().on(ANY).go(L, END)
+        DELETE2.deleteNonPrime().on(ANY).go(L, PREPARESUM)
+        SAVE2.savePrime().on(ANY).go(L, PREPARESUM)
+
+        PREPARESUM.prepareIteration().on(ANY).go(L, SUMCYCLE)
+
+        (SUMCYCLE.move_right_until(S, overstep=R).copyc()
+         .move_right_until(S, overstep=R).copyC()
+         .move_right_until(S, overstep=R).compare().step_right().on(ANY).go(L, COMPARED))
+
+        COMPARED.on(lx).go(L, FINISH)
+
+        CHECKINGc = COMPARED.on(l).new(L).clearSum().checkNextc()
+
+        CHECKINGc.on(t).new(L).iteratec().on(ANY).go(L, SUMCYCLE)
+        (CHECKINGc.on(E).new(L).resetc()
+         .move_right_until(S, overstep=R).checkNextC().step_right().on(ANY).go(L, CHECKINGC))
+
+        CHECKINGC.on(E).go(L, END)                       # В исторические времена мы сюда не доберемся
+        CHECKINGC.on(T).new(L).iterateC().on(ANY).go(L, SUMCYCLE)
+
+        FINISH.clearSum().finishIteration().on(ANY).go(L, INIT)
 
         return END
 
