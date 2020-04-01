@@ -216,7 +216,7 @@ class GoldState(LNRState):
     def compare(self):
         INIT = self
         STOP = self.state()
-        CHECK = self.state()
+        #CHECK = self.state()
         AFTERCHECK = self.state()
         NEXTSYMBOL = self.state()
 
@@ -226,11 +226,11 @@ class GoldState(LNRState):
          .drop(lx, L).move_right_until(N, overstep=R)
          .move_right_while(lx, overstep=R).on(ANY).go(L, NEXTSYMBOL))
 
-        NEXTSYMBOL.on(l).new(R).step_left().drop(lx, R).step_right().on(ANY).go(L, CHECK)
+        NEXTSYMBOL.on(l).new(R).step_left().drop(lx, R).move_left_until(S, overstep=R).step_left().on(ANY).go(R, INIT)
         NEXTSYMBOL.on(E).new(L).drop(l, R).on(ANY).go(L, STOP)
 
-        CHECK.on(l).new(R).move_left_until(S, overstep=R).step_left().on(ANY).go(R, INIT)
-        CHECK.on(E).go(L, AFTERCHECK)
+        #CHECK.on(l).new(R).move_left_until(S, overstep=R).step_left().on(ANY).go(R, INIT)
+        #CHECK.on(E).go(L, AFTERCHECK)
 
         AFTERCHECK.move_right_until(E, overstep=R).step_left().on(ANY).go(L, STOP)
 
@@ -291,7 +291,7 @@ class GoldState(LNRState):
         STOP = self.state()
 
         (INIT.move_right_until(c, overstep=R).step_left().drop(t, L)
-         .move_left_until(S, overstep=L).drop(c, L).on(ANY).go(R, STOP))
+         .move_right_until(S, overstep=L).drop(c, L).on(ANY).go(R, STOP))
 
         return STOP
 
